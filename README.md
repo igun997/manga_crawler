@@ -21,3 +21,14 @@
 
 ### Your Manga Path 
 1. **download/[session]** (session based timestamp)
+
+### Support Mangasites 
+
+1. Bacamanga.co
+2. Sektekomik.com 
+3. And other similiar manga site
+
+### Donation & Complain 
+
+indra.gunanda@gmail.com
+ 
