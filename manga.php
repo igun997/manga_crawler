@@ -4,12 +4,22 @@ use Igun997\Core\ZipPDF;
 use Curl\Curl;
 use PHPHtmlParser\Dom;
 
-$domain = $argv[2];
-$link_path = $argv[3];
+function rm_rec($cachePath){
+     foreach(scandir($cachePath) as $file) {
+         if ('.' === $file || '..' === $file) continue;
+         if (is_dir("$cachePath/$file")) rm_rec("$cachePath/$file");
+         else unlink("$cachePath/$file");
+     }
+        rmdir($cachePath);
+}
+
+$domain = $argv[1];
+$link_path = $argv[2];
 
 ZipPDF::log("Set Domain : ".$domain);
 ZipPDF::log("Set Path Link Chapter : ".$link_path);
-
+ZipPDF::log("Sleep 5 Seconds");
+sleep(5);
 $curl = new Curl();
 $curl->setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 $curl->setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
@@ -74,13 +84,15 @@ if ($curl->error) {
         if (!is_dir($dpath."/pdf/")){
             mkdir($dpath."/pdf/");
         }
-        $toPDF->zip($dpath."/$item",$dpath."/pdf/".$i++.".pdf",$cachePath);
-        foreach(scandir($cachePath) as $file) {
-            if ('.' === $file || '..' === $file) continue;
-            if (is_dir("$cachePath/$file")) rmdir_recursive("$cachePath/$file");
-            else unlink("$cachePath/$file");
+        try {
+            $toPDF->zip($dpath."/$item",$dpath."/pdf/".$i++.".pdf",$cachePath);
+        }catch (\PhpZip\Exception\ZipException $e){
+            ZipPDF::log("Kebanyakan Fetch !");
+            rm_rec($dpath);
+            exit();
         }
-        rmdir($cachePath);
+
+        rm_rec($cachePath);
     }
     $toPDF->merger($dpath."/pdf/",$dpath."/pdf");
 
